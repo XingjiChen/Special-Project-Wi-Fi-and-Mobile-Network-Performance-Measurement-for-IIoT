@@ -1,0 +1,64 @@
+clear
+figure;
+floorplan_bitmap = flipud(imread('floorplan.png')); 
+XWidth = size(floorplan_bitmap,2);
+YWidth = size(floorplan_bitmap,1);
+%px_per_m = 83.963;
+px_per_m = 82.8333;
+px_per_cm = px_per_m / 100;
+XOffset = 683/px_per_m;
+YOffset = (YWidth-2894)/px_per_m;
+XRange = [-XOffset, XWidth/px_per_m-XOffset];
+YRange = [-YOffset, YWidth/px_per_m-YOffset];
+img_handle = imshow(floorplan_bitmap, 'XData', XRange, 'YData', YRange);
+ax = gca;
+ax.YDir = 'normal';
+axis on
+
+% XY-coordinates for measurement locations
+
+% in pixels referring to 'floorplan.png'
+x_px = [800,  1178, 1356, 1519, 1691, 1858, 2026,  ...
+        2278, 2527, 3358, 4184,  4975, 5779, 6595, 7429, ...
+        8006,  8350];
+
+y_px = [2195, 2195, 2195, 2195, ...
+        2195, 2195, 2195,  ...
+        2195, 2195, 2195, 2195, 2195, 2195, 2195, 2195, ...
+        2195, 2195];
+
+% offset of antenna position relative to measurement cart
+% depends on measurement cart orientation relative to measurement location
+% antennas are located in a line 20-60 cm distance from marked distance 
+x_px_offset = [ 0,  0, 0, 0,  ...
+               0, 0, 0,  ...
+               0, 0, 0, 0,  0, 0, 0, 0, ...
+               0, 0];
+y_px_offset = [34, 34, 34, 34, ...
+               34, 34, 34, ...
+               34, 34, 34, 34, 34, 34, 34, 34, ...
+               34, 34];
+
+% offset due to wrong measuring device zero reference position
+x_px_offset_meas = [ -9,  -9, -9, -9,  ...
+               -9, -9, -9, ...
+               -9, -9, -9, -9,  -9, -9, -9, -9, ...
+               -9, -9]; 
+y_px_offset_meas = [ 9,  9, 9, 9,  ...
+               9, 9, 9,  ...
+               9, 9, 9, 9,  9, 9, 9, 9, ...
+               9, 9, ];
+% in meters 
+x_m = (x_px+x_px_offset+x_px_offset_meas) / px_per_m - XOffset;
+y_m = (YWidth - y_px-y_px_offset-y_px_offset_meas) / px_per_m - YOffset;
+
+% same for TX location
+x_TX_px = 1219;
+y_TX_px = -1305;
+x_TX_m = x_TX_px / px_per_m - XOffset;
+y_TX_m = (YWidth - y_TX_px) / px_per_m - YOffset;
+ 
+hold on
+plot(x_m, y_m, 'ro')
+% plot(x_TX_m, y_TX_m, 'ko')
+grid minor
